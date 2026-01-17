@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Night Picker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --bg-color: #f0f4f8; --card-bg: #ffffff; --text-main: #2d3748; --text-light: #718096; --badge-green: #c6f6d5; --text-green: #22543d; --badge-yellow: #fefcbf; --text-yellow: #744210; --badge-red: #fed7d7; --text-red: #822727; --badge-blue: #bee3f8; --text-blue: #2c5282; --badge-gray: #edf2f7; --text-gray: #4a5568; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-color); padding: 20px; color: var(--text-main); }
+        h1 { text-align: center; margin-bottom: 30px; font-weight: 800; color: #1a202c; }
+        .controls { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
+        input, select { padding: 12px; border: 1px solid #cbd5e0; border-radius: 8px; width: 250px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        #game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; max-width: 1400px; margin: 0 auto; }
+        .card { background: var(--card-bg); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transition: transform 0.2s; display: flex; flex-direction: column; border: 1px solid #e2e8f0; position: relative; }
+        .card:hover { transform: translateY(-5px); }
+        /* Image Sizing */
+        .card-image-container { height: 250px; background-color: #f8f9fa; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #eee; }
+        .card-img { width: 100%; height: 100%; object-fit: contain; padding: 10px; }
+        /* Error Text */
+        .error-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff0f0; color: #c53030; padding: 20px; font-size: 0.75em; word-break: break-all; overflow-y: auto; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .best-at-badge { position: absolute; top: 10px; right: 10px; background: #2b6cb0; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75em; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 2; }
+        .card-content { padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .card-title { font-size: 1.25em; font-weight: 700; color: #1a202c; line-height: 1.2; margin-bottom: 4px; }
+        .quick-strip { display: flex; justify-content: space-between; background: #f7fafc; padding: 8px; border-radius: 8px; font-size: 0.85em; color: var(--text-main); border: 1px solid #edf2f7; }
+        .quick-item { text-align: center; flex: 1; border-right: 1px solid #e2e8f0; }
+        .quick-item:last-child { border-right: none; }
+        .quick-label { display: block; font-size: 0.7em; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;}
+        .quick-value { font-weight: 600; display: block; }
+        .fit-strip { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .fit-badge { font-size: 0.75em; padding: 4px 6px; border-radius: 6px; text-align: center; font-weight: 600; background: var(--badge-gray); color: var(--text-gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bg-green { background: var(--badge-green); color: var(--text-green); }
+        .bg-yellow { background: var(--badge-yellow); color: var(--text-yellow); }
+        .bg-red { background: var(--badge-red); color: var(--text-red); }
+        .bg-blue { background: var(--badge-blue); color: var(--text-blue); }
+    </style>
+</head>
+<body>
+    <h1>🎲 Game Night Picker</h1>
+    <div class="controls">
+        <input type="text" id="searchInput" placeholder="Search title, description...">
+        <select id="playerFilter">
+            <option value="all">Any Player Count</option>
+            <option value="2">2 Players</option>
+            <option value="3">3 Players</option>
+            <option value="4">4 Players</option>
+            <option value="5">5 Players</option>
+            <option value="6">6+ Players</option>
+        </select>
+    </div>
+    <div id="game-grid">Loading collection...</div>
+    <script>
+        // --- CONFIGURATION ---
+        let sheetLink = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSVgdsccoaBe_HHr869Hv_U3V8UJ22nsMQC3cn-Ovi7z_AZRNrEJH2Jnn2ppE0hHdk0x5nCENKyd_Fv/pubhtml?gid=0&single=true";
+
+        if (sheetLink.includes('/pubhtml')) { sheetLink = sheetLink.replace('/pubhtml', '/pub').replace('?', '?output=csv&'); }
+        sheetLink += "&t=" + Date.now(); // Force refresh
+
+        let games = [];
+        const grid = document.getElementById('game-grid');
+        const searchInput = document.getElementById('searchInput');
+        const playerFilter = document.getElementById('playerFilter');
+
+        function init() {
+            Papa.parse(sheetLink, {
+                download: true, header: true, skipEmptyLines: true,
+                complete: function(results) { games = results.data; displayGames(games); }
+            });
+        }
+        function getColorClass(text) {
+            if (!text) return '';
+            const t = text.toLowerCase();
+            if (t.includes('easy') || t.includes('light') || t.includes('quick') || t.includes('low') || t.includes('co-op')) return 'bg-green';
+            if (t.includes('medium') || t.includes('moderate')) return 'bg-yellow';
+            if (t.includes('hard') || t.includes('heavy') || t.includes('long') || t.includes('high')) return 'bg-red';
+            if (t.includes('team') || t.includes('solo')) return 'bg-blue';
+            return '';
+        }
+        function displayGames(gamesToShow) {
+            grid.innerHTML = ''; 
+            gamesToShow.forEach(game => {
+                if (!game.Title) return;
+                const learningCurve = game['Learning Curve'] || '-';
+                const interaction = game['Interaction Level'] || '-';
+                const complexity = game['Complexity Weight'] || '-';
+                const setupTime = game['Setup Time'] || '-';
+                const bestPlayers = game['Best Players']; 
+
+                // --- SMART IMAGE LOADER ---
+                let imageSrc = game['Image URL'];
+                let imageHTML = `<div style="color:#a0aec0; text-align:center;">No Link</div>`;
+                let referrerPolicy = ""; 
+
+                if (imageSrc) {
+                    imageSrc = imageSrc.trim(); 
+                    if (imageSrc.includes('drive.google.com')) {
+                        referrerPolicy = 'referrerpolicy="no-referrer"';
+                        try { const id = imageSrc.split('/d/')[1].split('/')[0]; imageSrc = `https://drive.google.com/thumbnail?sz=w500&id=${id}`; } catch (e) {}
+                    }
+                    imageHTML = `<img src="${imageSrc}" class="card-img" alt="${game.Title}" ${referrerPolicy} onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="error-overlay"><i class="fas fa-exclamation-triangle" style="font-size:2em; margin-bottom:10px;"></i><b>Link Failed:</b><br>${imageSrc}</div>`;
+                }
+                let bestAtHTML = bestPlayers ? `<div class="best-at-badge"><i class="fas fa-star"></i> Best: ${bestPlayers}</div>` : '';
+                const cardHTML = `
+                    <div class="card">
+                        <div class="card-image-container">${imageHTML}${bestAtHTML}</div>
+                        <div class="card-content">
+                            <div class="card-title">${game.Title}</div>
+                            <div class="quick-strip">
+                                <div class="quick-item"><span class="quick-label"><i class="fas fa-users"></i> Play</span><span class="quick-value">${game.Players || '-'}</span></div>
+                                <div class="quick-item"><span class="quick-label"><i class="fas fa-clock"></i> Time</span><span class="quick-value">${game.Time || '-'}</span></div>
+                                <div class="quick-item"><span class="quick-label"><i class="fas fa-child"></i> Age</span><span class="quick-value">${game.Age || '-'}</span></div>
+                            </div>
+                            <div class="fit-strip">
+                                <div class="fit-badge ${getColorClass(learningCurve)}">Teach: ${learningCurve}</div>
+                                <div class="fit-badge ${getColorClass(game.Mode)}" style="grid-column: span 2;">${game.Mode || '-'}</div>
+                            </div>
+                            <hr style="border: 0; border-top: 1px solid #eee; margin: 5px 0;">
+                            <div class="fit-strip">
+                                <div class="fit-badge ${getColorClass(interaction)}">Int: ${interaction}</div>
+                                <div class="fit-badge ${getColorClass(complexity)}">Cplx: ${complexity}</div>
+                                <div class="fit-badge ${getColorClass(setupTime)}">Set: ${setupTime}</div>
+                            </div>
+                        </div>
+                    </div>`;
+                grid.innerHTML += cardHTML;
+            });
+            if(gamesToShow.length === 0) grid.innerHTML = '<p>No games found.</p>';
+        }
+        function filterGames() {
+            const term = searchInput.value.toLowerCase();
+            const playerVal = playerFilter.value;
+            const filtered = games.filter(g => {
+                if(!g.Title) return false;
+                const matchesSearch = Object.values(g).join(' ').toLowerCase().includes(term);
+                let matchesPlayer = true;
+                if(playerVal !== 'all') matchesPlayer = (g.Players || "").includes(playerVal);
+                return matchesSearch && matchesPlayer;
+            });
+            displayGames(filtered);
+        }
+        searchInput.addEventListener('input', filterGames);
+        playerFilter.addEventListener('change', filterGames);
+        init();
+    </script>
+</body>
+</html>
