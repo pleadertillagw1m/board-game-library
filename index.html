@@ -11,7 +11,7 @@
     <style>
         /* --- GLOBAL VARIABLES & RESET --- */
         :root {
-            --bg-color: #1a1a1a; /* Dark Background for the whole page */
+            --bg-color: #1a1a1a;
             --text-main: #ffffff;
             --accent: #f1c40f;
         }
@@ -23,7 +23,7 @@
             background-color: var(--bg-color); 
             padding: 20px; 
             color: var(--text-main);
-            line-height: 1.5;
+            line-height: 1.4; /* Slightly tighter line height for smaller text */
         }
 
         h1 { 
@@ -50,7 +50,7 @@
             border: 1px solid #444; 
             background-color: #333;
             color: white;
-            border-radius: 50px; /* Pill shape */
+            border-radius: 50px;
             width: 300px; 
             font-size: 1rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
@@ -70,7 +70,7 @@
             margin: 0 auto; 
         }
 
-        /* --- CARD CSS (FROM PREVIOUS DESIGN) --- */
+        /* --- CARD CSS --- */
         .flip-card {
             background-color: transparent;
             width: 320px;
@@ -169,12 +169,12 @@
         .stat-label i { color: white !important; font-size: 10px; }
         .stat-value { font-size: 16px; font-weight: 800; color: white; line-height: 1.2; }
 
-        /* BACK DESIGN */
+        /* --- BACK DESIGN (UPDATED) --- */
         .flip-card-back {
             background-color: #2d3436; 
             color: #ecf0f1; 
             transform: rotateY(180deg);
-            padding: 25px 20px;
+            padding: 20px; /* Slightly reduced padding */
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
@@ -186,36 +186,71 @@
         .back-header {
             width: 100%;
             border-bottom: 1px solid rgba(255,255,255,0.2); 
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
         }
 
+        /* FONT SIZE REDUCED */
         .back-title {
-            margin: 0; font-size: 2.2rem; font-weight: 800; color: white; line-height: 1.1;
+            margin: 0; 
+            font-size: 1.8rem; /* Was 2.2rem */
+            font-weight: 800; 
+            color: white; 
+            line-height: 1.1;
         }
 
-        .back-section { margin-bottom: 18px; width: 100%; }
+        .back-section { 
+            margin-bottom: 12px; /* Tighter spacing */
+            width: 100%; 
+        }
 
+        /* FONT SIZE REDUCED */
         .section-label {
-            font-size: 0.85rem; text-transform: uppercase; color: #b2bec3; 
-            letter-spacing: 1px; font-weight: 700; display: block; margin-bottom: 5px;
+            font-size: 0.75rem; /* Was 0.85rem */
+            text-transform: uppercase; 
+            color: #b2bec3; 
+            letter-spacing: 1px; 
+            font-weight: 700; 
+            display: block; 
+            margin-bottom: 4px;
         }
 
+        /* FONT SIZE REDUCED - MAIN BODY TEXT */
         .section-text {
-            font-size: 1.1rem; font-weight: 400; line-height: 1.4; color: white;
+            font-size: 0.95rem; /* Was 1.1rem */
+            font-weight: 400; 
+            color: white;
         }
 
-        .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+        /* --- NEW GRID SYSTEM FOR BACK --- */
+        .back-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two equal columns */
+            gap: 12px; /* Spacing between grid items */
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        /* Utility class to make mechanics span both columns */
+        .span-2-cols {
+            grid-column: span 2;
+        }
+
+        /* Tag Styling - slightly smaller */
+        .tag-cloud { display: flex; flex-wrap: wrap; gap: 6px; }
         
         .mechanic-tag {
             background: transparent; border: 1px solid rgba(255,255,255,0.4);
-            color: white; padding: 6px 12px; border-radius: 12px;
-            font-size: 0.9rem; font-weight: 600;
+            color: white; 
+            padding: 4px 10px; /* Smaller padding */
+            border-radius: 12px;
+            font-size: 0.85rem; /* Smaller font */
+            font-weight: 600;
         }
 
         .flip-hint {
             margin-top: auto; width: 100%; text-align: center; 
-            color: #636e72; font-size: 0.8rem; font-style: italic; padding-top: 20px;
+            color: #636e72; font-size: 0.8rem; font-style: italic; padding-top: 15px;
         }
 
     </style>
@@ -240,7 +275,6 @@
 
     <script>
         // --- CONFIGURATION ---
-        // Your existing Google Sheet Link
         let sheetLink = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSVgdsccoaBe_HHr869Hv_U3V8UJ22nsMQC3cn-Ovi7z_AZRNrEJH2Jnn2ppE0hHdk0x5nCENKyd_Fv/pubhtml?gid=0&single=true";
 
         if (sheetLink.includes('/pubhtml')) { sheetLink = sheetLink.replace('/pubhtml', '/pub').replace('?', '?output=csv&'); }
@@ -269,38 +303,30 @@
             grid.innerHTML = ''; 
             
             gamesToShow.forEach(game => {
-                // DATA MAPPING
-                // Try to handle case-sensitivity or missing columns gracefully
                 const title = game.Title || game.title || "Unknown Game";
                 let imageSrc = game['Image URL'] || game['Image'] || game.image || "";
                 
-                // Google Drive Image Helper
                 if (imageSrc.includes('drive.google.com')) {
                      try { const id = imageSrc.split('/d/')[1].split('/')[0]; imageSrc = `https://drive.google.com/thumbnail?sz=w500&id=${id}`; } catch (e) {}
                 }
 
-                // Stats
                 const players = game.Players || game.players || "-";
                 const time = game.Time || game.time || "-";
                 const age = game.Age || game.age || "-";
                 
-                // Back Data
                 const summary = game.Summary || game.summary || game.Description || "No summary available.";
                 const mode = game.Mode || game.mode || game['Game Mode'] || "-";
                 const category = game.Category || game.category || "-";
                 const mechanicsRaw = game.Mechanics || game.mechanics || "";
 
-                // Complexity Logic (Dots)
                 let score = parseInt(game['Complexity Score'] || game.complexity_score || 0);
                 const compText = game['Complexity Text'] || game.complexity_text || "Unrated";
                 
-                // Generate Dots HTML
                 let dotsHTML = '';
                 for(let i=1; i<=3; i++) {
                     dotsHTML += `<div class="dot ${i <= score ? 'filled' : ''}"></div>`;
                 }
 
-                // Generate Mechanics Tags
                 let mechanicsHTML = '';
                 if(mechanicsRaw) {
                     mechanicsRaw.split(',').forEach(tag => {
@@ -308,7 +334,7 @@
                     });
                 }
 
-                // CARD HTML TEMPLATE
+                // UPDATED CARD HTML TEMPLATE WITH GRID LAYOUT
                 const cardHTML = `
                     <div class="flip-card" onclick="toggleFlip(this)">
                         <div class="flip-card-inner">
@@ -325,7 +351,7 @@
                                 <div class="info-overlay">
                                     <div class="stats-box">
                                         <div class="stat-column">
-                                            <div class="stat-label"><i class="fa-solid fa-users"></i> Players</div>
+                                            <div class="stat-label"><i class="fa-solid fa-users"></i> Play</div>
                                             <div class="stat-value">${players}</div>
                                         </div>
                                         <div class="stat-column">
@@ -350,22 +376,25 @@
                                     <div class="section-text">${summary}</div>
                                 </div>
 
-                                <div class="back-section">
-                                    <span class="section-label">Game Mode</span>
-                                    <div class="section-text">${mode}</div>
-                                </div>
+                                <div class="back-info-grid">
+                                    <div>
+                                        <span class="section-label">Game Mode</span>
+                                        <div class="section-text">${mode}</div>
+                                    </div>
 
-                                <div class="back-section">
-                                    <span class="section-label">Category</span>
-                                    <div class="section-text">${category}</div>
-                                </div>
+                                    <div>
+                                        <span class="section-label">Category</span>
+                                        <div class="section-text">${category}</div>
+                                    </div>
 
-                                <div class="back-section">
-                                    <span class="section-label">Mechanics</span>
-                                    <div class="tag-cloud">
-                                        ${mechanicsHTML}
+                                    <div class="span-2-cols">
+                                        <span class="section-label">Mechanics</span>
+                                        <div class="tag-cloud">
+                                            ${mechanicsHTML}
+                                        </div>
                                     </div>
                                 </div>
+
                                 <div class="flip-hint"><i class="fas fa-undo"></i> Click to flip back</div>
                             </div>
                         </div>
@@ -382,14 +411,10 @@
             const playerVal = playerFilter.value;
 
             const filtered = games.filter(g => {
-                // Safe search across all values
                 const matchesSearch = Object.values(g).join(' ').toLowerCase().includes(term);
-                
-                // Logic for player count
                 const players = g.Players || g.players || "";
                 let matchesPlayer = true;
                 if(playerVal !== 'all') matchesPlayer = players.includes(playerVal);
-                
                 return matchesSearch && matchesPlayer;
             });
             displayGames(filtered);
