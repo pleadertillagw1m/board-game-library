@@ -21,44 +21,39 @@
         h1 { text-align: center; margin-bottom: 30px; font-weight: 800; color: white; font-size: 2rem; letter-spacing: -1px; }
 
         /* --- CONTROLS --- */
-        .controls { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
+        .controls { 
+            display: flex; justify-content: center; gap: 10px; margin-bottom: 40px; flex-wrap: wrap; 
+            max-width: 1200px; margin-left: auto; margin-right: auto;
+        }
+        
         input, select { 
-            padding: 12px 20px; border: 1px solid #444; background-color: #333; color: white; border-radius: 50px;
-            width: 100%; max-width: 300px; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); font-family: inherit; appearance: none; 
+            padding: 12px 15px; border: 1px solid #444; background-color: #333; color: white; border-radius: 50px;
+            width: 100%; flex: 1 1 200px; max-width: 300px; 
+            font-size: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); font-family: inherit; appearance: none; cursor: pointer;
+        }
+        
+        select {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat; background-position: right 15px top 50%; background-size: 10px auto; padding-right: 30px;
         }
         input:focus, select:focus { outline: 2px solid var(--accent); border-color: transparent; }
 
-        /* --- RESPONSIVE GRID --- */
+        /* --- GRID --- */
         #game-grid { 
-            display: grid; 
-            /* Grid adjusted for slightly wider cards (340px) */
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); 
-            gap: 30px; 
-            max-width: 1500px; 
-            margin: 0 auto; 
-            justify-items: center; 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; max-width: 1500px; margin: 0 auto; justify-items: center; 
         }
 
-        /* --- CARD CSS (TALLER & WIDER) --- */
+        /* --- CARD CSS --- */
         .flip-card {
-            background-color: transparent; 
-            width: 100%; 
-            max-width: 340px; /* INCREASED WIDTH */
-            height: 520px;    /* SIGNIFICANTLY INCREASED HEIGHT */
-            perspective: 1000px; -webkit-perspective: 1000px; 
-            cursor: pointer;
+            background-color: transparent; width: 100%; max-width: 340px; height: 520px;
+            perspective: 1000px; -webkit-perspective: 1000px; cursor: pointer;
         }
-
         .flip-card-inner {
             position: relative; width: 100%; height: 100%; text-align: center;
             transition: transform 0.6s; transform-style: preserve-3d; -webkit-transform-style: preserve-3d; 
             border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.5);
         }
-
-        .flip-card.flipped .flip-card-inner {
-            transform: rotateY(180deg); -webkit-transform: rotateY(180deg); 
-        }
-
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); -webkit-transform: rotateY(180deg); }
         .flip-card-front, .flip-card-back {
             position: absolute; width: 100%; height: 100%;
             -webkit-backface-visibility: hidden; backface-visibility: hidden;
@@ -68,22 +63,16 @@
 
         /* FRONT */
         .flip-card-front { background-color: #333; color: white; z-index: 2; }
-        
-        /* Adjusted Art Positioning for Taller Card */
         .card-bg-blur { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; filter: blur(12px) brightness(0.6); transform: scale(1.1); }
         .card-art-contain { 
-            position: absolute; 
-            top: 30px; left: 20px; right: 20px; 
-            bottom: 100px; /* Giving more breathing room at bottom */
+            position: absolute; top: 30px; left: 20px; right: 20px; bottom: 100px; 
             background-size: contain; background-repeat: no-repeat; background-position: center; 
             z-index: 1; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6)); 
         }
-
         .complexity-badge { position: absolute; top: 20px; right: 20px; z-index: 3; padding: 6px 12px; border-radius: 20px; font-weight: 800; font-size: 11px; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.4); background-color: #f1c40f; color: #222; display: flex; align-items: center; gap: 6px; }
         .complexity-dots { display: flex; gap: 3px; }
         .dot { width: 6px; height: 6px; border-radius: 50%; background-color: rgba(0,0,0,0.3); }
         .dot.filled { background-color: #222; }
-
         .info-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 0 20px 20px; box-sizing: border-box; z-index: 3; }
         .stats-box { background: transparent; border: 2px solid white; border-radius: 12px; display: flex; padding: 10px 0; }
         .stat-column { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; color: white; }
@@ -92,33 +81,25 @@
         .stat-label i { color: white !important; font-size: 11px; }
         .stat-value { font-size: 18px; font-weight: 800; color: white; line-height: 1.2; }
 
-        /* BACK (SCROLL ENABLED) */
+        /* BACK */
         .flip-card-back {
             background-color: #2d3436; color: #ecf0f1; 
             transform: rotateY(180deg); -webkit-transform: rotateY(180deg);
             padding: 25px; box-sizing: border-box;
             display: flex; flex-direction: column; align-items: flex-start; text-align: left;
             overflow-y: auto; -webkit-overflow-scrolling: touch; 
-            z-index: 1;
-            /* CRITICAL: Allows vertical scrolling without triggering tap */
-            touch-action: pan-y; 
-            scrollbar-width: none;
+            z-index: 1; touch-action: pan-y; scrollbar-width: none;
         }
         .flip-card-back::-webkit-scrollbar { display: none; }
-
         .back-header { width: 100%; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; margin-bottom: 15px; }
         .back-title { margin: 0; font-size: 1.8rem; font-weight: 800; color: white; line-height: 1.1; }
-        
         .back-section { margin-bottom: 15px; width: 100%; }
         .section-label { font-size: 0.75rem; text-transform: uppercase; color: #b2bec3; letter-spacing: 1px; font-weight: 700; display: block; margin-bottom: 4px; }
         .section-text { font-size: 0.95rem; font-weight: 400; color: white; }
-        
         .back-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; margin-top: 5px; }
         .span-2-cols { grid-column: span 2; }
-        
         .tag-cloud { display: flex; flex-wrap: wrap; gap: 6px; }
         .mechanic-tag { background: transparent; border: 1px solid rgba(255,255,255,0.4); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; }
-        
         .flip-hint { margin-top: auto; width: 100%; text-align: center; color: #636e72; font-size: 0.8rem; font-style: italic; padding-top: 20px; }
 
     </style>
@@ -128,67 +109,165 @@
     <h1>🎲 Game Library</h1>
 
     <div class="controls">
-        <input type="text" id="searchInput" placeholder="🔍 Search title, summary...">
+        <input type="text" id="searchInput" placeholder="🔍 Search title...">
+        
         <select id="playerFilter">
             <option value="all">👥 Any Player Count</option>
+            <option value="1">1 Player</option>
             <option value="2">2 Players</option>
             <option value="3">3 Players</option>
             <option value="4">4 Players</option>
             <option value="5">5 Players</option>
             <option value="6">6+ Players</option>
         </select>
+        
+        <select id="timeFilter">
+            <option value="all">⏳ Any Duration</option>
+            <option value="Quick">⚡ Quick (< 15m)</option>
+            <option value="Short">⏱️ Short (15-30m)</option>
+            <option value="Medium">🕰️ Medium (30-60m)</option>
+            <option value="Long">🗓️ Long (60m+)</option>
+        </select>
+
+        <select id="complexityFilter">
+            <option value="all">🧠 Any Complexity</option>
+        </select>
+
+        <select id="modeFilter">
+            <option value="all">⚔️ Any Mode</option>
+        </select>
+
+        <select id="categoryFilter">
+            <option value="all">📂 Any Category</option>
+        </select>
+        
+        <select id="mechanicFilter">
+            <option value="all">⚙️ Any Mechanic</option>
+        </select>
     </div>
 
     <div id="game-grid" style="color: #888;">Loading collection...</div>
 
     <script>
-        // --- CONFIGURATION ---
         let sheetLink = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSVgdsccoaBe_HHr869Hv_U3V8UJ22nsMQC3cn-Ovi7z_AZRNrEJH2Jnn2ppE0hHdk0x5nCENKyd_Fv/pubhtml?gid=0&single=true";
-
         if (sheetLink.includes('/pubhtml')) { sheetLink = sheetLink.replace('/pubhtml', '/pub').replace('?', '?output=csv&'); }
         sheetLink += "&t=" + Date.now(); 
 
         let games = [];
         const grid = document.getElementById('game-grid');
+        
         const searchInput = document.getElementById('searchInput');
         const playerFilter = document.getElementById('playerFilter');
+        const timeFilter = document.getElementById('timeFilter');
+        const complexityFilter = document.getElementById('complexityFilter');
+        const modeFilter = document.getElementById('modeFilter');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const mechanicFilter = document.getElementById('mechanicFilter');
 
         function init() {
             Papa.parse(sheetLink, {
                 download: true, header: true, skipEmptyLines: true,
-                complete: function(results) { games = results.data; displayGames(games); }
+                complete: function(results) { 
+                    games = results.data; 
+                    populateFilters(games); 
+                    displayGames(games); 
+                }
             });
         }
 
-        // --- POINTER TRACKING (Scroll vs Tap) ---
-        let startX, startY;
-        let isDragging = false;
+        // --- FILTER POPULATION ---
+        function populateFilters(data) {
+            const complexities = new Set();
+            const modes = new Set();
+            const categories = new Set();
+            const mechanics = new Set();
 
-        function handlePointerDown(e) {
-            isDragging = false;
-            startX = e.clientX;
-            startY = e.clientY;
+            data.forEach(game => {
+                const cText = game['Complexity Text'] || game.complexity_text;
+                if(cText) complexities.add(cText);
+
+                const mText = game['Game Mode'] || game.mode;
+                if(mText) modes.add(mText);
+
+                const catText = game['Category'] || game.category;
+                if(catText) categories.add(catText);
+                
+                const mechText = game['Mechanics'] || game.mechanics;
+                if(mechText) {
+                    mechText.split(',').forEach(m => mechanics.add(m.trim()));
+                }
+            });
+
+            // Forced Order for Complexity
+            const orderedComplexity = ['Simple', 'Moderate', 'Complex'];
+            orderedComplexity.forEach(level => {
+                if(complexities.has(level)) {
+                    const option = document.createElement('option');
+                    option.value = level;
+                    option.textContent = level;
+                    complexityFilter.appendChild(option);
+                }
+            });
+
+            const addOptions = (set, element) => {
+                Array.from(set).sort().forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item;
+                    option.textContent = item;
+                    element.appendChild(option);
+                });
+            };
+
+            addOptions(modes, modeFilter);
+            addOptions(categories, categoryFilter);
+            addOptions(mechanics, mechanicFilter);
         }
 
+        // --- TIME HELPER ---
+        function getTimeCategory(timeStr) {
+            if(!timeStr) return "Unknown";
+            const numbers = timeStr.match(/\d+/g);
+            if(!numbers) return "Unknown";
+            let avgTime = 0;
+            if(numbers.length === 1) {
+                avgTime = parseInt(numbers[0]);
+            } else {
+                avgTime = (parseInt(numbers[0]) + parseInt(numbers[1])) / 2;
+            }
+            if (avgTime <= 15) return "Quick";
+            if (avgTime > 15 && avgTime <= 30) return "Short";
+            if (avgTime > 30 && avgTime <= 60) return "Medium";
+            if (avgTime > 60) return "Long";
+            return "Unknown";
+        }
+
+        // --- PLAYER HELPER ---
+        function checkPlayerSupport(gamePlayerString, filterValue) {
+            if (!gamePlayerString) return false;
+            if (filterValue === 'all') return true;
+            const selected = parseInt(filterValue);
+            const numbers = gamePlayerString.match(/\d+/g);
+            if (!numbers) return false;
+            const min = parseInt(numbers[0]);
+            let max = min;
+            if (numbers.length > 1) { max = parseInt(numbers[1]); } 
+            else if (gamePlayerString.includes('+')) { max = 99; }
+            return selected >= min && selected <= max;
+        }
+
+        // --- FLIP LOGIC ---
+        let startX, startY, isDragging = false;
+        function handlePointerDown(e) { isDragging = false; startX = e.clientX; startY = e.clientY; }
         function handlePointerMove(e) {
             if (!startX || !startY) return;
-            // Sensitivity: If moved more than 10px, it's a scroll/drag
-            let diffX = Math.abs(e.clientX - startX);
-            let diffY = Math.abs(e.clientY - startY);
-            if (diffX > 10 || diffY > 10) {
-                isDragging = true;
-            }
+            if (Math.abs(e.clientX - startX) > 10 || Math.abs(e.clientY - startY) > 10) isDragging = true;
         }
-
         function handlePointerUp(e, cardElement) {
-            // Only flip if not dragging and not selecting text
             if (!isDragging && window.getSelection().toString().length === 0) {
                 cardElement.classList.toggle('flipped');
             }
-            // Reset
             startX = null; startY = null; isDragging = false;
         }
-        // ----------------------------------------
 
         function displayGames(gamesToShow) {
             grid.innerHTML = ''; 
@@ -197,17 +276,24 @@
                 const title = game.Title || game.title || "Unknown Game";
                 let imageSrc = game['Image URL'] || game['Image'] || game.image || "";
                 
-                if (imageSrc.includes('drive.google.com')) {
-                     try { const id = imageSrc.split('/d/')[1].split('/')[0]; imageSrc = `https://drive.google.com/thumbnail?sz=w500&id=${id}`; } catch (e) {}
+                // --- FIX FOR APOSTROPHES & GOOGLE DRIVE ---
+                if (imageSrc) {
+                    imageSrc = imageSrc.replace(/'/g, "%27");
+                    if (imageSrc.includes('drive.google.com')) { 
+                        try { const id = imageSrc.split('/d/')[1].split('/')[0]; imageSrc = `https://drive.google.com/thumbnail?sz=w500&id=${id}`; } catch (e) {} 
+                    }
                 }
 
                 const players = game.Players || game.players || "-";
                 const time = game.Time || game.time || "-";
                 const age = game.Age || game.age || "-";
-                const summary = game.Summary || game.summary || game.Description || "No summary available.";
-                const mode = game.Mode || game.mode || game['Game Mode'] || "-";
-                const category = game.Category || game.category || "-";
-                const mechanicsRaw = game.Mechanics || game.mechanics || "";
+                
+                let summary = (game.Summary || game.summary || game.Description || "").trim();
+                if(!summary) summary = "No summary available.";
+
+                const mode = game['Game Mode'] || game.mode || "-";
+                const category = game['Category'] || game.category || "-";
+                const mechanicsRaw = game['Mechanics'] || game.mechanics || "";
 
                 let score = parseInt(game['Complexity Score'] || game.complexity_score || 0);
                 const compText = game['Complexity Text'] || game.complexity_text || "Unrated";
@@ -225,7 +311,6 @@
                          onpointerdown="handlePointerDown(event)" 
                          onpointermove="handlePointerMove(event)"
                          onpointerup="handlePointerUp(event, this)">
-                         
                         <div class="flip-card-inner">
                             <div class="flip-card-front">
                                 <div class="card-bg-blur" style="background-image: url('${imageSrc}');"></div>
@@ -236,36 +321,19 @@
                                 </div>
                                 <div class="info-overlay">
                                     <div class="stats-box">
-                                        <div class="stat-column">
-                                            <div class="stat-label"><i class="fa-solid fa-users"></i> Play</div>
-                                            <div class="stat-value">${players}</div>
-                                        </div>
-                                        <div class="stat-column">
-                                            <div class="stat-label"><i class="fa-solid fa-clock"></i> Time</div>
-                                            <div class="stat-value">${time}</div>
-                                        </div>
-                                        <div class="stat-column">
-                                            <div class="stat-label"><i class="fa-solid fa-child"></i> Age</div>
-                                            <div class="stat-value">${age}</div>
-                                        </div>
+                                        <div class="stat-column"><div class="stat-label"><i class="fa-solid fa-users"></i> Players</div><div class="stat-value">${players}</div></div>
+                                        <div class="stat-column"><div class="stat-label"><i class="fa-solid fa-clock"></i> Time</div><div class="stat-value">${time}</div></div>
+                                        <div class="stat-column"><div class="stat-label"><i class="fa-solid fa-child"></i> Age</div><div class="stat-value">${age}</div></div>
                                     </div>
                                 </div>
                             </div>
                             <div class="flip-card-back">
-                                <div class="back-header">
-                                    <h2 class="back-title">${title}</h2>
-                                </div>
-                                <div class="back-section">
-                                    <span class="section-label">Summary</span>
-                                    <div class="section-text">${summary}</div>
-                                </div>
+                                <div class="back-header"><h2 class="back-title">${title}</h2></div>
+                                <div class="back-section"><span class="section-label">Summary</span><div class="section-text">${summary}</div></div>
                                 <div class="back-info-grid">
                                     <div><span class="section-label">Game Mode</span><div class="section-text">${mode}</div></div>
                                     <div><span class="section-label">Category</span><div class="section-text">${category}</div></div>
-                                    <div class="span-2-cols">
-                                        <span class="section-label">Mechanics</span>
-                                        <div class="tag-cloud">${mechanicsHTML}</div>
-                                    </div>
+                                    <div class="span-2-cols"><span class="section-label">Mechanics</span><div class="tag-cloud">${mechanicsHTML}</div></div>
                                 </div>
                                 <div class="flip-hint"><i class="fas fa-undo"></i> Click to flip back</div>
                             </div>
@@ -275,24 +343,67 @@
                 grid.innerHTML += cardHTML;
             });
 
-            if(gamesToShow.length === 0) grid.innerHTML = '<p style="text-align:center; width:100%; color:#888;">No games found.</p>';
+            if(gamesToShow.length === 0) grid.innerHTML = '<p style="text-align:center; width:100%; color:#888;">No games found matching these filters.</p>';
         }
 
+        // --- MASTER FILTER ---
         function filterGames() {
             const term = searchInput.value.toLowerCase();
             const playerVal = playerFilter.value;
+            const timeVal = timeFilter.value;
+            const complexityVal = complexityFilter.value;
+            const modeVal = modeFilter.value;
+            const categoryVal = categoryFilter.value;
+            const mechanicVal = mechanicFilter.value;
+
             const filtered = games.filter(g => {
                 const matchesSearch = Object.values(g).join(' ').toLowerCase().includes(term);
-                const players = g.Players || g.players || "";
-                let matchesPlayer = true;
-                if(playerVal !== 'all') matchesPlayer = players.includes(playerVal);
-                return matchesSearch && matchesPlayer;
+                
+                const pString = g.Players || g.players;
+                const matchesPlayer = checkPlayerSupport(pString, playerVal);
+
+                let matchesTime = true;
+                if(timeVal !== 'all') {
+                    const tString = g.Time || g.time || "";
+                    matchesTime = (getTimeCategory(tString) === timeVal);
+                }
+
+                let matchesComplexity = true;
+                if(complexityVal !== 'all') {
+                     const cText = g['Complexity Text'] || g.complexity_text;
+                     matchesComplexity = (cText === complexityVal);
+                }
+
+                let matchesMode = true;
+                if(modeVal !== 'all') {
+                    const mText = g['Game Mode'] || g.mode;
+                    matchesMode = (mText === modeVal);
+                }
+
+                let matchesCategory = true;
+                if(categoryVal !== 'all') {
+                    const catText = g['Category'] || g.category;
+                    matchesCategory = (catText === categoryVal);
+                }
+
+                let matchesMechanic = true;
+                if(mechanicVal !== 'all') {
+                    const mechText = g['Mechanics'] || g.mechanics || "";
+                    matchesMechanic = mechText.includes(mechanicVal);
+                }
+
+                return matchesSearch && matchesPlayer && matchesTime && matchesComplexity && matchesMode && matchesCategory && matchesMechanic;
             });
             displayGames(filtered);
         }
 
         searchInput.addEventListener('input', filterGames);
         playerFilter.addEventListener('change', filterGames);
+        timeFilter.addEventListener('change', filterGames);
+        complexityFilter.addEventListener('change', filterGames);
+        modeFilter.addEventListener('change', filterGames);
+        categoryFilter.addEventListener('change', filterGames);
+        mechanicFilter.addEventListener('change', filterGames);
 
         init();
     </script>
