@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Game Night Picker</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -21,9 +21,10 @@
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: var(--bg-color); 
-            padding: 20px; 
+            padding: 20px 10px; /* Less side padding on mobile */
             color: var(--text-main);
-            line-height: 1.4; /* Slightly tighter line height for smaller text */
+            line-height: 1.4;
+            -webkit-tap-highlight-color: transparent; /* Removes grey tap box on iOS */
         }
 
         h1 { 
@@ -31,17 +32,17 @@
             margin-bottom: 30px; 
             font-weight: 800; 
             color: white; 
-            font-size: 2.5rem;
+            font-size: 2rem; /* Slightly smaller for mobile safety */
             letter-spacing: -1px;
             text-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
 
-        /* --- SEARCH CONTROLS --- */
+        /* --- CONTROLS (Mobile Friendly) --- */
         .controls { 
             display: flex; 
             justify-content: center; 
             gap: 15px; 
-            margin-bottom: 50px; 
+            margin-bottom: 40px; 
             flex-wrap: wrap; 
         }
         
@@ -51,32 +52,40 @@
             background-color: #333;
             color: white;
             border-radius: 50px;
-            width: 300px; 
-            font-size: 1rem;
+            width: 100%; /* Full width on tiny screens */
+            max-width: 300px; 
+            font-size: 16px; /* Prevents auto-zoom on iOS */
             box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
             font-family: inherit;
+            appearance: none; /* Removes default iOS styling */
         }
         
-        input::placeholder { color: #888; }
         input:focus, select:focus { outline: 2px solid var(--accent); border-color: transparent; }
 
-        /* --- GRID LAYOUT --- */
+        /* --- RESPONSIVE GRID LAYOUT --- */
         #game-grid { 
-            display: flex; 
-            flex-wrap: wrap; 
-            justify-content: center; 
-            gap: 30px; 
+            display: grid;
+            /* Auto-fit columns: Minimum 300px, otherwise stretch */
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
             max-width: 1400px; 
             margin: 0 auto; 
+            justify-items: center; /* Centers cards in their grid cells */
         }
 
-        /* --- CARD CSS --- */
+        /* --- CARD CSS (iOS FIXED) --- */
         .flip-card {
             background-color: transparent;
-            width: 320px;
+            width: 100%; 
+            max-width: 320px; /* Limits width on desktop */
             height: 400px;
             perspective: 1000px;
+            /* iOS Fixes */
+            -webkit-perspective: 1000px; 
             cursor: pointer;
+            user-select: none; /* Prevents text highlighting on tap */
+            -webkit-user-select: none;
+            touch-action: manipulation; /* Improves touch response */
         }
 
         .flip-card-inner {
@@ -86,28 +95,35 @@
             text-align: center;
             transition: transform 0.6s;
             transform-style: preserve-3d;
+            /* iOS Fixes */
+            -webkit-transform-style: preserve-3d; 
             border-radius: 16px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.5);
         }
 
         .flip-card.flipped .flip-card-inner {
             transform: rotateY(180deg);
+            -webkit-transform: rotateY(180deg); /* iOS Fix */
         }
 
         .flip-card-front, .flip-card-back {
             position: absolute;
             width: 100%;
             height: 100%;
-            -webkit-backface-visibility: hidden;
+            -webkit-backface-visibility: hidden; /* iOS Fix */
             backface-visibility: hidden;
             border-radius: 16px;
             overflow: hidden;
+            /* iOS Fix for z-index issues */
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
         }
 
         /* FRONT DESIGN */
         .flip-card-front {
             background-color: #333;
             color: white;
+            z-index: 2; /* Ensures front stays on top until flipped */
         }
 
         .card-bg-blur {
@@ -127,7 +143,7 @@
 
         /* COMPLEXITY DOTS */
         .complexity-badge {
-            position: absolute; top: 15px; right: 15px; z-index: 2;
+            position: absolute; top: 15px; right: 15px; z-index: 3;
             padding: 6px 12px; border-radius: 20px;
             font-weight: 800; font-size: 11px; text-transform: uppercase;
             box-shadow: 0 2px 4px rgba(0,0,0,0.4);
@@ -142,7 +158,7 @@
         /* GHOST STATS BOX */
         .info-overlay {
             position: absolute; bottom: 0; left: 0; width: 100%;
-            padding: 0 15px 15px; box-sizing: border-box; z-index: 2;
+            padding: 0 15px 15px; box-sizing: border-box; z-index: 3;
         }
 
         .stats-box {
@@ -169,18 +185,21 @@
         .stat-label i { color: white !important; font-size: 10px; }
         .stat-value { font-size: 16px; font-weight: 800; color: white; line-height: 1.2; }
 
-        /* --- BACK DESIGN (UPDATED) --- */
+        /* --- BACK DESIGN --- */
         .flip-card-back {
             background-color: #2d3436; 
             color: #ecf0f1; 
             transform: rotateY(180deg);
-            padding: 20px; /* Slightly reduced padding */
+            -webkit-transform: rotateY(180deg); /* iOS Fix */
+            padding: 20px; 
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
             text-align: left;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+            z-index: 1;
         }
 
         .back-header {
@@ -190,23 +209,21 @@
             margin-bottom: 12px;
         }
 
-        /* FONT SIZE REDUCED */
         .back-title {
             margin: 0; 
-            font-size: 1.8rem; /* Was 2.2rem */
+            font-size: 1.8rem;
             font-weight: 800; 
             color: white; 
             line-height: 1.1;
         }
 
         .back-section { 
-            margin-bottom: 12px; /* Tighter spacing */
+            margin-bottom: 12px; 
             width: 100%; 
         }
 
-        /* FONT SIZE REDUCED */
         .section-label {
-            font-size: 0.75rem; /* Was 0.85rem */
+            font-size: 0.75rem; 
             text-transform: uppercase; 
             color: #b2bec3; 
             letter-spacing: 1px; 
@@ -215,36 +232,31 @@
             margin-bottom: 4px;
         }
 
-        /* FONT SIZE REDUCED - MAIN BODY TEXT */
         .section-text {
-            font-size: 0.95rem; /* Was 1.1rem */
+            font-size: 0.95rem; 
             font-weight: 400; 
             color: white;
         }
 
-        /* --- NEW GRID SYSTEM FOR BACK --- */
+        /* GRID SYSTEM FOR BACK */
         .back-info-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* Two equal columns */
-            gap: 12px; /* Spacing between grid items */
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
             width: 100%;
             margin-top: 5px;
         }
 
-        /* Utility class to make mechanics span both columns */
-        .span-2-cols {
-            grid-column: span 2;
-        }
+        .span-2-cols { grid-column: span 2; }
 
-        /* Tag Styling - slightly smaller */
         .tag-cloud { display: flex; flex-wrap: wrap; gap: 6px; }
         
         .mechanic-tag {
             background: transparent; border: 1px solid rgba(255,255,255,0.4);
             color: white; 
-            padding: 4px 10px; /* Smaller padding */
+            padding: 4px 10px; 
             border-radius: 12px;
-            font-size: 0.85rem; /* Smaller font */
+            font-size: 0.85rem; 
             font-weight: 600;
         }
 
@@ -296,6 +308,8 @@
         }
 
         function toggleFlip(card) {
+            // Check if user is clicking on a text selection
+            if (window.getSelection().toString().length > 0) return;
             card.classList.toggle('flipped');
         }
 
@@ -334,7 +348,6 @@
                     });
                 }
 
-                // UPDATED CARD HTML TEMPLATE WITH GRID LAYOUT
                 const cardHTML = `
                     <div class="flip-card" onclick="toggleFlip(this)">
                         <div class="flip-card-inner">
