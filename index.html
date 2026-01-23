@@ -21,10 +21,10 @@
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: var(--bg-color); 
-            padding: 20px 10px; /* Less side padding on mobile */
+            padding: 20px 10px; 
             color: var(--text-main);
             line-height: 1.4;
-            -webkit-tap-highlight-color: transparent; /* Removes grey tap box on iOS */
+            -webkit-tap-highlight-color: transparent; 
         }
 
         h1 { 
@@ -32,12 +32,12 @@
             margin-bottom: 30px; 
             font-weight: 800; 
             color: white; 
-            font-size: 2rem; /* Slightly smaller for mobile safety */
+            font-size: 2rem; 
             letter-spacing: -1px;
             text-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
 
-        /* --- CONTROLS (Mobile Friendly) --- */
+        /* --- CONTROLS --- */
         .controls { 
             display: flex; 
             justify-content: center; 
@@ -52,40 +52,34 @@
             background-color: #333;
             color: white;
             border-radius: 50px;
-            width: 100%; /* Full width on tiny screens */
+            width: 100%; 
             max-width: 300px; 
-            font-size: 16px; /* Prevents auto-zoom on iOS */
+            font-size: 16px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
             font-family: inherit;
-            appearance: none; /* Removes default iOS styling */
+            appearance: none; 
         }
         
         input:focus, select:focus { outline: 2px solid var(--accent); border-color: transparent; }
 
-        /* --- RESPONSIVE GRID LAYOUT --- */
+        /* --- RESPONSIVE GRID --- */
         #game-grid { 
             display: grid;
-            /* Auto-fit columns: Minimum 300px, otherwise stretch */
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 25px;
             max-width: 1400px; 
             margin: 0 auto; 
-            justify-items: center; /* Centers cards in their grid cells */
+            justify-items: center; 
         }
 
-        /* --- CARD CSS (iOS FIXED) --- */
+        /* --- CARD CSS --- */
         .flip-card {
             background-color: transparent;
             width: 100%; 
-            max-width: 320px; /* Limits width on desktop */
+            max-width: 320px; 
             height: 400px;
             perspective: 1000px;
-            /* iOS Fixes */
             -webkit-perspective: 1000px; 
-            cursor: pointer;
-            user-select: none; /* Prevents text highlighting on tap */
-            -webkit-user-select: none;
-            touch-action: manipulation; /* Improves touch response */
         }
 
         .flip-card-inner {
@@ -95,7 +89,6 @@
             text-align: center;
             transition: transform 0.6s;
             transform-style: preserve-3d;
-            /* iOS Fixes */
             -webkit-transform-style: preserve-3d; 
             border-radius: 16px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.5);
@@ -103,27 +96,27 @@
 
         .flip-card.flipped .flip-card-inner {
             transform: rotateY(180deg);
-            -webkit-transform: rotateY(180deg); /* iOS Fix */
+            -webkit-transform: rotateY(180deg); 
         }
 
         .flip-card-front, .flip-card-back {
             position: absolute;
             width: 100%;
             height: 100%;
-            -webkit-backface-visibility: hidden; /* iOS Fix */
+            -webkit-backface-visibility: hidden; 
             backface-visibility: hidden;
             border-radius: 16px;
             overflow: hidden;
-            /* iOS Fix for z-index issues */
             transform: translateZ(0);
             -webkit-transform: translateZ(0);
         }
 
-        /* FRONT DESIGN */
+        /* --- FRONT DESIGN --- */
         .flip-card-front {
             background-color: #333;
             color: white;
-            z-index: 2; /* Ensures front stays on top until flipped */
+            z-index: 2; 
+            cursor: pointer; /* Pointer only on front now */
         }
 
         .card-bg-blur {
@@ -141,7 +134,6 @@
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
         }
 
-        /* COMPLEXITY DOTS */
         .complexity-badge {
             position: absolute; top: 15px; right: 15px; z-index: 3;
             padding: 6px 12px; border-radius: 20px;
@@ -155,7 +147,6 @@
         .dot { width: 6px; height: 6px; border-radius: 50%; background-color: rgba(0,0,0,0.3); }
         .dot.filled { background-color: #222; }
 
-        /* GHOST STATS BOX */
         .info-overlay {
             position: absolute; bottom: 0; left: 0; width: 100%;
             padding: 0 15px 15px; box-sizing: border-box; z-index: 3;
@@ -185,12 +176,12 @@
         .stat-label i { color: white !important; font-size: 10px; }
         .stat-value { font-size: 16px; font-weight: 800; color: white; line-height: 1.2; }
 
-        /* --- BACK DESIGN --- */
+        /* --- BACK DESIGN (SCROLL SAFE) --- */
         .flip-card-back {
             background-color: #2d3436; 
             color: #ecf0f1; 
             transform: rotateY(180deg);
-            -webkit-transform: rotateY(180deg); /* iOS Fix */
+            -webkit-transform: rotateY(180deg); 
             padding: 20px; 
             box-sizing: border-box;
             display: flex;
@@ -198,8 +189,16 @@
             align-items: flex-start;
             text-align: left;
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+            -webkit-overflow-scrolling: touch; 
             z-index: 1;
+            /* Hide Scrollbar but keep functionality */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* IE/Edge */
+        }
+        
+        /* Hide scrollbar for Chrome/Safari/Opera */
+        .flip-card-back::-webkit-scrollbar {
+            display: none;
         }
 
         .back-header {
@@ -207,6 +206,7 @@
             border-bottom: 1px solid rgba(255,255,255,0.2); 
             padding-bottom: 8px;
             margin-bottom: 12px;
+            cursor: pointer; /* Indicates clickable */
         }
 
         .back-title {
@@ -238,7 +238,7 @@
             color: white;
         }
 
-        /* GRID SYSTEM FOR BACK */
+        /* GRID SYSTEM */
         .back-info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr; 
@@ -263,6 +263,7 @@
         .flip-hint {
             margin-top: auto; width: 100%; text-align: center; 
             color: #636e72; font-size: 0.8rem; font-style: italic; padding-top: 15px;
+            cursor: pointer; /* Indicates clickable */
         }
 
     </style>
@@ -307,10 +308,10 @@
             });
         }
 
-        function toggleFlip(card) {
-            // Check if user is clicking on a text selection
-            if (window.getSelection().toString().length > 0) return;
-            card.classList.toggle('flipped');
+        function toggleFlip(element) {
+            // Find the closest card container and toggle the class
+            const card = element.closest('.flip-card');
+            if(card) card.classList.toggle('flipped');
         }
 
         function displayGames(gamesToShow) {
@@ -348,11 +349,16 @@
                     });
                 }
 
+                // UPDATED HTML TEMPLATE:
+                // 1. onclick removed from .flip-card
+                // 2. onclick added to .flip-card-front (entire face)
+                // 3. onclick added to .back-header and .flip-hint ONLY
+                
                 const cardHTML = `
-                    <div class="flip-card" onclick="toggleFlip(this)">
+                    <div class="flip-card">
                         <div class="flip-card-inner">
                             
-                            <div class="flip-card-front">
+                            <div class="flip-card-front" onclick="toggleFlip(this)">
                                 <div class="card-bg-blur" style="background-image: url('${imageSrc}');"></div>
                                 <div class="card-art-contain" style="background-image: url('${imageSrc}');"></div>
                                 
@@ -380,7 +386,7 @@
                             </div>
 
                             <div class="flip-card-back">
-                                <div class="back-header">
+                                <div class="back-header" onclick="toggleFlip(this)">
                                     <h2 class="back-title">${title}</h2>
                                 </div>
                                 
@@ -408,7 +414,7 @@
                                     </div>
                                 </div>
 
-                                <div class="flip-hint"><i class="fas fa-undo"></i> Click to flip back</div>
+                                <div class="flip-hint" onclick="toggleFlip(this)"><i class="fas fa-undo"></i> Click to flip back</div>
                             </div>
                         </div>
                     </div>
