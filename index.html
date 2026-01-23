@@ -9,262 +9,96 @@
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* --- GLOBAL VARIABLES & RESET --- */
-        :root {
-            --bg-color: #1a1a1a;
-            --text-main: #ffffff;
-            --accent: #f1c40f;
-        }
-
+        /* --- GLOBAL RESET --- */
+        :root { --bg-color: #1a1a1a; --text-main: #ffffff; --accent: #f1c40f; }
         * { box-sizing: border-box; }
-
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: var(--bg-color); 
-            padding: 20px 10px; 
-            color: var(--text-main);
-            line-height: 1.4;
+            padding: 20px 10px; color: var(--text-main); line-height: 1.4;
             -webkit-tap-highlight-color: transparent; 
         }
-
-        h1 { 
-            text-align: center; 
-            margin-bottom: 30px; 
-            font-weight: 800; 
-            color: white; 
-            font-size: 2rem; 
-            letter-spacing: -1px;
-            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
+        h1 { text-align: center; margin-bottom: 30px; font-weight: 800; color: white; font-size: 2rem; letter-spacing: -1px; }
 
         /* --- CONTROLS --- */
-        .controls { 
-            display: flex; 
-            justify-content: center; 
-            gap: 15px; 
-            margin-bottom: 40px; 
-            flex-wrap: wrap; 
-        }
-        
+        .controls { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
         input, select { 
-            padding: 12px 20px; 
-            border: 1px solid #444; 
-            background-color: #333;
-            color: white;
-            border-radius: 50px;
-            width: 100%; 
-            max-width: 300px; 
-            font-size: 16px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
-            font-family: inherit;
-            appearance: none; 
+            padding: 12px 20px; border: 1px solid #444; background-color: #333; color: white; border-radius: 50px;
+            width: 100%; max-width: 300px; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); font-family: inherit; appearance: none; 
         }
-        
         input:focus, select:focus { outline: 2px solid var(--accent); border-color: transparent; }
 
-        /* --- RESPONSIVE GRID --- */
+        /* --- GRID --- */
         #game-grid { 
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            max-width: 1400px; 
-            margin: 0 auto; 
-            justify-items: center; 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; max-width: 1400px; margin: 0 auto; justify-items: center; 
         }
 
         /* --- CARD CSS --- */
         .flip-card {
-            background-color: transparent;
-            width: 100%; 
-            max-width: 320px; 
-            height: 400px;
-            perspective: 1000px;
-            -webkit-perspective: 1000px; 
+            background-color: transparent; width: 100%; max-width: 320px; height: 400px;
+            perspective: 1000px; -webkit-perspective: 1000px; 
+            /* We handle clicks manually via JS now */
+            cursor: pointer;
         }
 
         .flip-card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-            -webkit-transform-style: preserve-3d; 
-            border-radius: 16px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            position: relative; width: 100%; height: 100%; text-align: center;
+            transition: transform 0.6s; transform-style: preserve-3d; -webkit-transform-style: preserve-3d; 
+            border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.5);
         }
 
         .flip-card.flipped .flip-card-inner {
-            transform: rotateY(180deg);
-            -webkit-transform: rotateY(180deg); 
+            transform: rotateY(180deg); -webkit-transform: rotateY(180deg); 
         }
 
         .flip-card-front, .flip-card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            -webkit-backface-visibility: hidden; 
-            backface-visibility: hidden;
-            border-radius: 16px;
-            overflow: hidden;
-            transform: translateZ(0);
-            -webkit-transform: translateZ(0);
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            border-radius: 16px; overflow: hidden;
+            /* iOS z-fighting fix */
+            transform: translateZ(0); -webkit-transform: translateZ(0);
         }
 
-        /* --- FRONT DESIGN --- */
-        .flip-card-front {
-            background-color: #333;
-            color: white;
-            z-index: 2; 
-            cursor: pointer; /* Pointer only on front now */
-        }
+        /* FRONT */
+        .flip-card-front { background-color: #333; color: white; z-index: 2; }
+        .card-bg-blur { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; filter: blur(12px) brightness(0.6); transform: scale(1.1); }
+        .card-art-contain { position: absolute; top: 20px; left: 20px; right: 20px; bottom: 80px; background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 1; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6)); }
 
-        .card-bg-blur {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-size: cover; background-position: center;
-            filter: blur(12px) brightness(0.6); 
-            transform: scale(1.1);
-        }
-
-        .card-art-contain {
-            position: absolute;
-            top: 20px; left: 20px; right: 20px; bottom: 80px; 
-            background-size: contain; background-repeat: no-repeat; background-position: center;
-            z-index: 1;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
-        }
-
-        .complexity-badge {
-            position: absolute; top: 15px; right: 15px; z-index: 3;
-            padding: 6px 12px; border-radius: 20px;
-            font-weight: 800; font-size: 11px; text-transform: uppercase;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-            background-color: #f1c40f; color: #222;
-            display: flex; align-items: center; gap: 6px;
-        }
-
+        .complexity-badge { position: absolute; top: 15px; right: 15px; z-index: 3; padding: 6px 12px; border-radius: 20px; font-weight: 800; font-size: 11px; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.4); background-color: #f1c40f; color: #222; display: flex; align-items: center; gap: 6px; }
         .complexity-dots { display: flex; gap: 3px; }
         .dot { width: 6px; height: 6px; border-radius: 50%; background-color: rgba(0,0,0,0.3); }
         .dot.filled { background-color: #222; }
 
-        .info-overlay {
-            position: absolute; bottom: 0; left: 0; width: 100%;
-            padding: 0 15px 15px; box-sizing: border-box; z-index: 3;
-        }
-
-        .stats-box {
-            background: transparent; 
-            border: 2px solid white; 
-            border-radius: 12px;
-            display: flex; padding: 8px 0; 
-        }
-
-        .stat-column {
-            flex: 1; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; position: relative; color: white; 
-        }
-
-        .stat-column:not(:last-child)::after {
-            content: ''; position: absolute; right: 0; top: 15%; height: 70%; width: 1px;
-            background-color: white;
-        }
-
-        .stat-label {
-            font-size: 10px; color: white; font-weight: 700; text-transform: uppercase;
-            margin-bottom: 2px; display: flex; align-items: center; gap: 4px;
-        }
+        .info-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 0 15px 15px; box-sizing: border-box; z-index: 3; }
+        .stats-box { background: transparent; border: 2px solid white; border-radius: 12px; display: flex; padding: 8px 0; }
+        .stat-column { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; color: white; }
+        .stat-column:not(:last-child)::after { content: ''; position: absolute; right: 0; top: 15%; height: 70%; width: 1px; background-color: white; }
+        .stat-label { font-size: 10px; color: white; font-weight: 700; text-transform: uppercase; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; }
         .stat-label i { color: white !important; font-size: 10px; }
         .stat-value { font-size: 16px; font-weight: 800; color: white; line-height: 1.2; }
 
-        /* --- BACK DESIGN (SCROLL SAFE) --- */
+        /* BACK (IOS FIXES APPLIED) */
         .flip-card-back {
-            background-color: #2d3436; 
-            color: #ecf0f1; 
-            transform: rotateY(180deg);
-            -webkit-transform: rotateY(180deg); 
-            padding: 20px; 
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            text-align: left;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch; 
+            background-color: #2d3436; color: #ecf0f1; 
+            /* Ensure Back is rotated 180deg */
+            transform: rotateY(180deg); -webkit-transform: rotateY(180deg);
+            padding: 20px; box-sizing: border-box;
+            display: flex; flex-direction: column; align-items: flex-start; text-align: left;
+            overflow-y: auto; -webkit-overflow-scrolling: touch; 
+            /* Fix iOS layer issues */
             z-index: 1;
-            /* Hide Scrollbar but keep functionality */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none;  /* IE/Edge */
-        }
-        
-        /* Hide scrollbar for Chrome/Safari/Opera */
-        .flip-card-back::-webkit-scrollbar {
-            display: none;
         }
 
-        .back-header {
-            width: 100%;
-            border-bottom: 1px solid rgba(255,255,255,0.2); 
-            padding-bottom: 8px;
-            margin-bottom: 12px;
-            cursor: pointer; /* Indicates clickable */
-        }
-
-        .back-title {
-            margin: 0; 
-            font-size: 1.8rem;
-            font-weight: 800; 
-            color: white; 
-            line-height: 1.1;
-        }
-
-        .back-section { 
-            margin-bottom: 12px; 
-            width: 100%; 
-        }
-
-        .section-label {
-            font-size: 0.75rem; 
-            text-transform: uppercase; 
-            color: #b2bec3; 
-            letter-spacing: 1px; 
-            font-weight: 700; 
-            display: block; 
-            margin-bottom: 4px;
-        }
-
-        .section-text {
-            font-size: 0.95rem; 
-            font-weight: 400; 
-            color: white;
-        }
-
-        /* GRID SYSTEM */
-        .back-info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr; 
-            gap: 12px; 
-            width: 100%;
-            margin-top: 5px;
-        }
-
+        .back-header { width: 100%; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 12px; }
+        .back-title { margin: 0; font-size: 1.8rem; font-weight: 800; color: white; line-height: 1.1; }
+        .back-section { margin-bottom: 12px; width: 100%; }
+        .section-label { font-size: 0.75rem; text-transform: uppercase; color: #b2bec3; letter-spacing: 1px; font-weight: 700; display: block; margin-bottom: 4px; }
+        .section-text { font-size: 0.95rem; font-weight: 400; color: white; }
+        .back-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; margin-top: 5px; }
         .span-2-cols { grid-column: span 2; }
-
         .tag-cloud { display: flex; flex-wrap: wrap; gap: 6px; }
-        
-        .mechanic-tag {
-            background: transparent; border: 1px solid rgba(255,255,255,0.4);
-            color: white; 
-            padding: 4px 10px; 
-            border-radius: 12px;
-            font-size: 0.85rem; 
-            font-weight: 600;
-        }
-
-        .flip-hint {
-            margin-top: auto; width: 100%; text-align: center; 
-            color: #636e72; font-size: 0.8rem; font-style: italic; padding-top: 15px;
-            cursor: pointer; /* Indicates clickable */
-        }
+        .mechanic-tag { background: transparent; border: 1px solid rgba(255,255,255,0.4); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; }
+        .flip-hint { margin-top: auto; width: 100%; text-align: center; color: #636e72; font-size: 0.8rem; font-style: italic; padding-top: 15px; }
 
     </style>
 </head>
@@ -287,7 +121,6 @@
     <div id="game-grid" style="color: #888;">Loading collection...</div>
 
     <script>
-        // --- CONFIGURATION ---
         let sheetLink = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSVgdsccoaBe_HHr869Hv_U3V8UJ22nsMQC3cn-Ovi7z_AZRNrEJH2Jnn2ppE0hHdk0x5nCENKyd_Fv/pubhtml?gid=0&single=true";
 
         if (sheetLink.includes('/pubhtml')) { sheetLink = sheetLink.replace('/pubhtml', '/pub').replace('?', '?output=csv&'); }
@@ -301,18 +134,42 @@
         function init() {
             Papa.parse(sheetLink, {
                 download: true, header: true, skipEmptyLines: true,
-                complete: function(results) { 
-                    games = results.data; 
-                    displayGames(games); 
-                }
+                complete: function(results) { games = results.data; displayGames(games); }
             });
         }
 
-        function toggleFlip(element) {
-            // Find the closest card container and toggle the class
-            const card = element.closest('.flip-card');
-            if(card) card.classList.toggle('flipped');
+        // --- NEW SCROLL VS TAP LOGIC ---
+        let startX, startY;
+        let isDragging = false;
+
+        function handlePointerDown(e) {
+            isDragging = false;
+            startX = e.clientX;
+            startY = e.clientY;
         }
+
+        function handlePointerMove(e) {
+            // If user moves mouse/finger more than 10px, assume they are scrolling
+            if (!startX || !startY) return;
+            let diffX = Math.abs(e.clientX - startX);
+            let diffY = Math.abs(e.clientY - startY);
+            if (diffX > 10 || diffY > 10) {
+                isDragging = true;
+            }
+        }
+
+        function handlePointerUp(e, cardElement) {
+            // Only flip if they did NOT drag
+            if (!isDragging) {
+                // Also check if they selected text
+                if (window.getSelection().toString().length === 0) {
+                    cardElement.classList.toggle('flipped');
+                }
+            }
+            // Reset
+            startX = null; startY = null; isDragging = false;
+        }
+        // -------------------------------
 
         function displayGames(gamesToShow) {
             grid.innerHTML = ''; 
@@ -328,7 +185,6 @@
                 const players = game.Players || game.players || "-";
                 const time = game.Time || game.time || "-";
                 const age = game.Age || game.age || "-";
-                
                 const summary = game.Summary || game.summary || game.Description || "No summary available.";
                 const mode = game.Mode || game.mode || game['Game Mode'] || "-";
                 const category = game.Category || game.category || "-";
@@ -338,35 +194,28 @@
                 const compText = game['Complexity Text'] || game.complexity_text || "Unrated";
                 
                 let dotsHTML = '';
-                for(let i=1; i<=3; i++) {
-                    dotsHTML += `<div class="dot ${i <= score ? 'filled' : ''}"></div>`;
-                }
+                for(let i=1; i<=3; i++) { dotsHTML += `<div class="dot ${i <= score ? 'filled' : ''}"></div>`; }
 
                 let mechanicsHTML = '';
                 if(mechanicsRaw) {
-                    mechanicsRaw.split(',').forEach(tag => {
-                        mechanicsHTML += `<span class="mechanic-tag">${tag.trim()}</span>`;
-                    });
+                    mechanicsRaw.split(',').forEach(tag => { mechanicsHTML += `<span class="mechanic-tag">${tag.trim()}</span>`; });
                 }
 
-                // UPDATED HTML TEMPLATE:
-                // 1. onclick removed from .flip-card
-                // 2. onclick added to .flip-card-front (entire face)
-                // 3. onclick added to .back-header and .flip-hint ONLY
-                
+                // Add pointer events to track scroll vs click
                 const cardHTML = `
-                    <div class="flip-card">
+                    <div class="flip-card" 
+                         onpointerdown="handlePointerDown(event)" 
+                         onpointermove="handlePointerMove(event)"
+                         onpointerup="handlePointerUp(event, this)">
+                         
                         <div class="flip-card-inner">
-                            
-                            <div class="flip-card-front" onclick="toggleFlip(this)">
+                            <div class="flip-card-front">
                                 <div class="card-bg-blur" style="background-image: url('${imageSrc}');"></div>
                                 <div class="card-art-contain" style="background-image: url('${imageSrc}');"></div>
-                                
                                 <div class="complexity-badge">
                                     <div class="complexity-dots">${dotsHTML}</div>
                                     <span>${compText}</span>
                                 </div>
-                                
                                 <div class="info-overlay">
                                     <div class="stats-box">
                                         <div class="stat-column">
@@ -384,37 +233,23 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="flip-card-back">
-                                <div class="back-header" onclick="toggleFlip(this)">
+                                <div class="back-header">
                                     <h2 class="back-title">${title}</h2>
                                 </div>
-                                
                                 <div class="back-section">
                                     <span class="section-label">Summary</span>
                                     <div class="section-text">${summary}</div>
                                 </div>
-
                                 <div class="back-info-grid">
-                                    <div>
-                                        <span class="section-label">Game Mode</span>
-                                        <div class="section-text">${mode}</div>
-                                    </div>
-
-                                    <div>
-                                        <span class="section-label">Category</span>
-                                        <div class="section-text">${category}</div>
-                                    </div>
-
+                                    <div><span class="section-label">Game Mode</span><div class="section-text">${mode}</div></div>
+                                    <div><span class="section-label">Category</span><div class="section-text">${category}</div></div>
                                     <div class="span-2-cols">
                                         <span class="section-label">Mechanics</span>
-                                        <div class="tag-cloud">
-                                            ${mechanicsHTML}
-                                        </div>
+                                        <div class="tag-cloud">${mechanicsHTML}</div>
                                     </div>
                                 </div>
-
-                                <div class="flip-hint" onclick="toggleFlip(this)"><i class="fas fa-undo"></i> Click to flip back</div>
+                                <div class="flip-hint"><i class="fas fa-undo"></i> Click to flip back</div>
                             </div>
                         </div>
                     </div>
@@ -428,7 +263,6 @@
         function filterGames() {
             const term = searchInput.value.toLowerCase();
             const playerVal = playerFilter.value;
-
             const filtered = games.filter(g => {
                 const matchesSearch = Object.values(g).join(' ').toLowerCase().includes(term);
                 const players = g.Players || g.players || "";
