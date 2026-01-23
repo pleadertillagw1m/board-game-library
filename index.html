@@ -28,16 +28,24 @@
         }
         input:focus, select:focus { outline: 2px solid var(--accent); border-color: transparent; }
 
-        /* --- GRID --- */
+        /* --- RESPONSIVE GRID --- */
         #game-grid { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; max-width: 1400px; margin: 0 auto; justify-items: center; 
+            display: grid; 
+            /* Grid adjusted for slightly wider cards (340px) */
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); 
+            gap: 30px; 
+            max-width: 1500px; 
+            margin: 0 auto; 
+            justify-items: center; 
         }
 
-        /* --- CARD CSS --- */
+        /* --- CARD CSS (TALLER & WIDER) --- */
         .flip-card {
-            background-color: transparent; width: 100%; max-width: 320px; height: 400px;
+            background-color: transparent; 
+            width: 100%; 
+            max-width: 340px; /* INCREASED WIDTH */
+            height: 520px;    /* SIGNIFICANTLY INCREASED HEIGHT */
             perspective: 1000px; -webkit-perspective: 1000px; 
-            /* We handle clicks manually via JS now */
             cursor: pointer;
         }
 
@@ -55,50 +63,63 @@
             position: absolute; width: 100%; height: 100%;
             -webkit-backface-visibility: hidden; backface-visibility: hidden;
             border-radius: 16px; overflow: hidden;
-            /* iOS z-fighting fix */
             transform: translateZ(0); -webkit-transform: translateZ(0);
         }
 
         /* FRONT */
         .flip-card-front { background-color: #333; color: white; z-index: 2; }
+        
+        /* Adjusted Art Positioning for Taller Card */
         .card-bg-blur { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; filter: blur(12px) brightness(0.6); transform: scale(1.1); }
-        .card-art-contain { position: absolute; top: 20px; left: 20px; right: 20px; bottom: 80px; background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 1; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6)); }
+        .card-art-contain { 
+            position: absolute; 
+            top: 30px; left: 20px; right: 20px; 
+            bottom: 100px; /* Giving more breathing room at bottom */
+            background-size: contain; background-repeat: no-repeat; background-position: center; 
+            z-index: 1; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6)); 
+        }
 
-        .complexity-badge { position: absolute; top: 15px; right: 15px; z-index: 3; padding: 6px 12px; border-radius: 20px; font-weight: 800; font-size: 11px; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.4); background-color: #f1c40f; color: #222; display: flex; align-items: center; gap: 6px; }
+        .complexity-badge { position: absolute; top: 20px; right: 20px; z-index: 3; padding: 6px 12px; border-radius: 20px; font-weight: 800; font-size: 11px; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.4); background-color: #f1c40f; color: #222; display: flex; align-items: center; gap: 6px; }
         .complexity-dots { display: flex; gap: 3px; }
         .dot { width: 6px; height: 6px; border-radius: 50%; background-color: rgba(0,0,0,0.3); }
         .dot.filled { background-color: #222; }
 
-        .info-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 0 15px 15px; box-sizing: border-box; z-index: 3; }
-        .stats-box { background: transparent; border: 2px solid white; border-radius: 12px; display: flex; padding: 8px 0; }
+        .info-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 0 20px 20px; box-sizing: border-box; z-index: 3; }
+        .stats-box { background: transparent; border: 2px solid white; border-radius: 12px; display: flex; padding: 10px 0; }
         .stat-column { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; color: white; }
         .stat-column:not(:last-child)::after { content: ''; position: absolute; right: 0; top: 15%; height: 70%; width: 1px; background-color: white; }
-        .stat-label { font-size: 10px; color: white; font-weight: 700; text-transform: uppercase; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; }
-        .stat-label i { color: white !important; font-size: 10px; }
-        .stat-value { font-size: 16px; font-weight: 800; color: white; line-height: 1.2; }
+        .stat-label { font-size: 11px; color: white; font-weight: 700; text-transform: uppercase; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; }
+        .stat-label i { color: white !important; font-size: 11px; }
+        .stat-value { font-size: 18px; font-weight: 800; color: white; line-height: 1.2; }
 
-        /* BACK (IOS FIXES APPLIED) */
+        /* BACK (SCROLL ENABLED) */
         .flip-card-back {
             background-color: #2d3436; color: #ecf0f1; 
-            /* Ensure Back is rotated 180deg */
             transform: rotateY(180deg); -webkit-transform: rotateY(180deg);
-            padding: 20px; box-sizing: border-box;
+            padding: 25px; box-sizing: border-box;
             display: flex; flex-direction: column; align-items: flex-start; text-align: left;
             overflow-y: auto; -webkit-overflow-scrolling: touch; 
-            /* Fix iOS layer issues */
             z-index: 1;
+            /* CRITICAL: Allows vertical scrolling without triggering tap */
+            touch-action: pan-y; 
+            scrollbar-width: none;
         }
+        .flip-card-back::-webkit-scrollbar { display: none; }
 
-        .back-header { width: 100%; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 12px; }
+        .back-header { width: 100%; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; margin-bottom: 15px; }
         .back-title { margin: 0; font-size: 1.8rem; font-weight: 800; color: white; line-height: 1.1; }
-        .back-section { margin-bottom: 12px; width: 100%; }
+        
+        .back-section { margin-bottom: 15px; width: 100%; }
         .section-label { font-size: 0.75rem; text-transform: uppercase; color: #b2bec3; letter-spacing: 1px; font-weight: 700; display: block; margin-bottom: 4px; }
         .section-text { font-size: 0.95rem; font-weight: 400; color: white; }
-        .back-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; margin-top: 5px; }
+        
+        .back-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; margin-top: 5px; }
         .span-2-cols { grid-column: span 2; }
+        
         .tag-cloud { display: flex; flex-wrap: wrap; gap: 6px; }
         .mechanic-tag { background: transparent; border: 1px solid rgba(255,255,255,0.4); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; }
-        .flip-hint { margin-top: auto; width: 100%; text-align: center; color: #636e72; font-size: 0.8rem; font-style: italic; padding-top: 15px; }
+        
+        .flip-hint { margin-top: auto; width: 100%; text-align: center; color: #636e72; font-size: 0.8rem; font-style: italic; padding-top: 20px; }
 
     </style>
 </head>
@@ -121,6 +142,7 @@
     <div id="game-grid" style="color: #888;">Loading collection...</div>
 
     <script>
+        // --- CONFIGURATION ---
         let sheetLink = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSVgdsccoaBe_HHr869Hv_U3V8UJ22nsMQC3cn-Ovi7z_AZRNrEJH2Jnn2ppE0hHdk0x5nCENKyd_Fv/pubhtml?gid=0&single=true";
 
         if (sheetLink.includes('/pubhtml')) { sheetLink = sheetLink.replace('/pubhtml', '/pub').replace('?', '?output=csv&'); }
@@ -138,7 +160,7 @@
             });
         }
 
-        // --- NEW SCROLL VS TAP LOGIC ---
+        // --- POINTER TRACKING (Scroll vs Tap) ---
         let startX, startY;
         let isDragging = false;
 
@@ -149,8 +171,8 @@
         }
 
         function handlePointerMove(e) {
-            // If user moves mouse/finger more than 10px, assume they are scrolling
             if (!startX || !startY) return;
+            // Sensitivity: If moved more than 10px, it's a scroll/drag
             let diffX = Math.abs(e.clientX - startX);
             let diffY = Math.abs(e.clientY - startY);
             if (diffX > 10 || diffY > 10) {
@@ -159,17 +181,14 @@
         }
 
         function handlePointerUp(e, cardElement) {
-            // Only flip if they did NOT drag
-            if (!isDragging) {
-                // Also check if they selected text
-                if (window.getSelection().toString().length === 0) {
-                    cardElement.classList.toggle('flipped');
-                }
+            // Only flip if not dragging and not selecting text
+            if (!isDragging && window.getSelection().toString().length === 0) {
+                cardElement.classList.toggle('flipped');
             }
             // Reset
             startX = null; startY = null; isDragging = false;
         }
-        // -------------------------------
+        // ----------------------------------------
 
         function displayGames(gamesToShow) {
             grid.innerHTML = ''; 
@@ -201,7 +220,6 @@
                     mechanicsRaw.split(',').forEach(tag => { mechanicsHTML += `<span class="mechanic-tag">${tag.trim()}</span>`; });
                 }
 
-                // Add pointer events to track scroll vs click
                 const cardHTML = `
                     <div class="flip-card" 
                          onpointerdown="handlePointerDown(event)" 
