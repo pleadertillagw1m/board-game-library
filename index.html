@@ -24,12 +24,16 @@
         .controls { 
             display: flex; justify-content: center; gap: 10px; margin-bottom: 40px; flex-wrap: wrap; 
             max-width: 1200px; margin-left: auto; margin-right: auto;
+            position: relative; z-index: 100; 
         }
         
-        input, select { 
+        /* STANDARD INPUTS */
+        input[type="text"], select, .custom-select-trigger { 
             padding: 12px 15px; border: 1px solid #444; background-color: #333; color: white; border-radius: 50px;
             width: 100%; flex: 1 1 200px; max-width: 300px; 
             font-size: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); font-family: inherit; appearance: none; cursor: pointer;
+            height: 46px; 
+            display: flex; align-items: center; justify-content: space-between; 
         }
         
         select {
@@ -38,9 +42,46 @@
         }
         input:focus, select:focus { outline: 2px solid var(--accent); border-color: transparent; }
 
+        /* --- CUSTOM AGE DROPDOWN STYLES --- */
+        .custom-select-wrapper {
+            position: relative; flex: 1 1 200px; max-width: 300px; user-select: none;
+        }
+        
+        .custom-select-trigger::after {
+            content: ''; width: 0; height: 0; 
+            border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 5px solid white;
+            margin-left: 10px;
+        }
+
+        .custom-dropdown-panel {
+            position: absolute; top: 110%; left: 0; right: 0;
+            background: #2d3436; border: 1px solid #444; border-radius: 15px;
+            padding: 20px 15px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            display: none; z-index: 200;
+            flex-direction: column; align-items: center;
+        }
+        
+        .custom-select-wrapper.open .custom-dropdown-panel { display: flex; }
+        .custom-select-wrapper.open .custom-select-trigger { border-color: var(--accent); }
+
+        /* Slider */
+        .slider-label { font-size: 1.2rem; font-weight: 800; color: var(--accent); margin-bottom: 5px; text-align: center; width: 100%; }
+        
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; background: transparent; margin: 0;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: var(--accent);
+            cursor: pointer; margin-top: -7px; box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; cursor: pointer; background: #666; border-radius: 2px;
+        }
+
         /* --- GRID --- */
         #game-grid { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; max-width: 1500px; margin: 0 auto; justify-items: center; 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; max-width: 1500px; margin: 0 auto; justify-items: center; z-index: 1;
         }
 
         /* --- CARD CSS --- */
@@ -69,23 +110,17 @@
             background-size: contain; background-repeat: no-repeat; background-position: center; 
             z-index: 1; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6)); 
         }
-        
-        /* COMPLEXITY BADGE (TOP RIGHT) */
         .complexity-badge { position: absolute; top: 20px; right: 20px; z-index: 3; padding: 6px 12px; border-radius: 20px; font-weight: 800; font-size: 11px; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.4); background-color: #f1c40f; color: #222; display: flex; align-items: center; gap: 6px; }
         .complexity-dots { display: flex; gap: 3px; }
         .dot { width: 6px; height: 6px; border-radius: 50%; background-color: rgba(0,0,0,0.3); }
         .dot.filled { background-color: #222; }
-
-        /* NEW EXPANSION BADGE (TOP LEFT) */
         .expansion-badge {
             position: absolute; top: 20px; left: 20px; z-index: 3;
             padding: 6px 12px; border-radius: 20px;
             font-weight: 800; font-size: 11px; text-transform: uppercase;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-            background-color: #8e44ad; color: white; /* Purple */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4); background-color: #8e44ad; color: white;
             display: flex; align-items: center; gap: 5px;
         }
-
         .info-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 0 20px 20px; box-sizing: border-box; z-index: 3; }
         .stats-box { background: transparent; border: 2px solid white; border-radius: 12px; display: flex; padding: 10px 0; }
         .stat-column { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; color: white; }
@@ -105,10 +140,7 @@
         }
         .flip-card-back::-webkit-scrollbar { display: none; }
         .back-header { width: 100%; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; margin-bottom: 15px; }
-        
-        /* TITLE SIZE CHANGED TO 1.5REM */
         .back-title { margin: 0; font-size: 1.5rem; font-weight: 800; color: white; line-height: 1.2; }
-        
         .back-section { margin-bottom: 15px; width: 100%; }
         .section-label { font-size: 0.75rem; text-transform: uppercase; color: #b2bec3; letter-spacing: 1px; font-weight: 700; display: block; margin-bottom: 4px; }
         .section-text { font-size: 0.95rem; font-weight: 400; color: white; }
@@ -139,10 +171,10 @@
         
         <select id="timeFilter">
             <option value="all">⏳ Any Duration</option>
-            <option value="Quick">⚡ Quick (< 15m)</option>
-            <option value="Short">⏱️ Short (15-30m)</option>
-            <option value="Medium">🕰️ Medium (30-60m)</option>
-            <option value="Long">🗓️ Long (60m+)</option>
+            <option value="Quick">Quick (< 15m)</option>
+            <option value="Short">Short (15-30m)</option>
+            <option value="Medium">Medium (30-60m)</option>
+            <option value="Long">Long (60m+)</option>
         </select>
 
         <select id="complexityFilter">
@@ -157,6 +189,15 @@
             <option value="all">📂 Any Category</option>
         </select>
         
+        <div class="custom-select-wrapper" id="ageDropdown">
+            <div class="custom-select-trigger" onclick="toggleAgeDropdown(event)">
+                <span id="ageTriggerText">🎂 Any Age</span>
+            </div>
+            <div class="custom-dropdown-panel" onclick="event.stopPropagation()">
+                <input type="range" id="ageSlider" min="0" max="14" step="1" value="14">
+            </div>
+        </div>
+
         <select id="mechanicFilter">
             <option value="all">⚙️ Any Mechanic</option>
         </select>
@@ -179,17 +220,35 @@
         const modeFilter = document.getElementById('modeFilter');
         const categoryFilter = document.getElementById('categoryFilter');
         const mechanicFilter = document.getElementById('mechanicFilter');
+        
+        // Age Slider Elements
+        const ageSlider = document.getElementById('ageSlider');
+        const ageTriggerText = document.getElementById('ageTriggerText');
+        const ageDropdown = document.getElementById('ageDropdown');
 
         function init() {
             Papa.parse(sheetLink, {
                 download: true, header: true, skipEmptyLines: true,
                 complete: function(results) { 
                     games = results.data; 
+                    setupAgeSlider(games); 
                     populateFilters(games); 
                     displayGames(games); 
                 }
             });
         }
+
+        // --- CUSTOM DROPDOWN UI LOGIC ---
+        function toggleAgeDropdown(e) {
+            e.stopPropagation();
+            ageDropdown.classList.toggle('open');
+        }
+        
+        document.addEventListener('click', function(e) {
+            if (!ageDropdown.contains(e.target)) {
+                ageDropdown.classList.remove('open');
+            }
+        });
 
         // --- FILTER POPULATION ---
         function populateFilters(data) {
@@ -201,20 +260,14 @@
             data.forEach(game => {
                 const cText = game['Complexity Text'] || game.complexity_text;
                 if(cText) complexities.add(cText);
-
                 const mText = game['Game Mode'] || game.mode;
                 if(mText) modes.add(mText);
-
                 const catText = game['Category'] || game.category;
                 if(catText) categories.add(catText);
-                
                 const mechText = game['Mechanics'] || game.mechanics;
-                if(mechText) {
-                    mechText.split(',').forEach(m => mechanics.add(m.trim()));
-                }
+                if(mechText) mechText.split(',').forEach(m => mechanics.add(m.trim()));
             });
 
-            // Forced Order for Complexity
             const orderedComplexity = ['Simple', 'Moderate', 'Complex'];
             orderedComplexity.forEach(level => {
                 if(complexities.has(level)) {
@@ -239,17 +292,38 @@
             addOptions(mechanics, mechanicFilter);
         }
 
-        // --- TIME HELPER ---
+        // --- AGE SLIDER SETUP ---
+        function setupAgeSlider(data) {
+            let minAge = 14; 
+            data.forEach(g => {
+                const ageStr = g.Age || g.age;
+                if(ageStr) {
+                    const num = parseInt(ageStr.match(/\d+/));
+                    if(num < minAge) minAge = num;
+                }
+            });
+            ageSlider.min = minAge;
+            ageSlider.max = 14; 
+            ageSlider.value = 14;
+        }
+
+        ageSlider.addEventListener('input', function() {
+            if(this.value == 14) {
+                ageTriggerText.textContent = "🎂 Any Age";
+            } else {
+                ageTriggerText.textContent = "🎂 Age: " + this.value + "+";
+            }
+            filterGames();
+        });
+
+        // --- HELPERS ---
         function getTimeCategory(timeStr) {
             if(!timeStr) return "Unknown";
             const numbers = timeStr.match(/\d+/g);
             if(!numbers) return "Unknown";
             let avgTime = 0;
-            if(numbers.length === 1) {
-                avgTime = parseInt(numbers[0]);
-            } else {
-                avgTime = (parseInt(numbers[0]) + parseInt(numbers[1])) / 2;
-            }
+            if(numbers.length === 1) { avgTime = parseInt(numbers[0]); } 
+            else { avgTime = (parseInt(numbers[0]) + parseInt(numbers[1])) / 2; }
             if (avgTime <= 15) return "Quick";
             if (avgTime > 15 && avgTime <= 30) return "Short";
             if (avgTime > 30 && avgTime <= 60) return "Medium";
@@ -257,7 +331,6 @@
             return "Unknown";
         }
 
-        // --- PLAYER HELPER ---
         function checkPlayerSupport(gamePlayerString, filterValue) {
             if (!gamePlayerString) return false;
             if (filterValue === 'all') return true;
@@ -292,7 +365,6 @@
                 const title = game.Title || game.title || "Unknown Game";
                 let imageSrc = game['Image URL'] || game['Image'] || game.image || "";
                 
-                // --- FIX FOR APOSTROPHES & GOOGLE DRIVE ---
                 if (imageSrc) {
                     imageSrc = imageSrc.replace(/'/g, "%27");
                     if (imageSrc.includes('drive.google.com')) { 
@@ -322,17 +394,10 @@
                     mechanicsRaw.split(',').forEach(tag => { mechanicsHTML += `<span class="mechanic-tag">${tag.trim()}</span>`; });
                 }
 
-                // CHECK FOR EXPANSION
-                // Logic: Does the title contain "Expansion" OR does the mechanics list contain "Expansion"?
                 let isExpansion = (title.toLowerCase().includes('expansion') || mechanicsRaw.toLowerCase().includes('expansion'));
-                
                 let expansionBadgeHTML = '';
                 if(isExpansion) {
-                    expansionBadgeHTML = `
-                        <div class="expansion-badge">
-                            <i class="fas fa-puzzle-piece"></i> EXPANSION
-                        </div>
-                    `;
+                    expansionBadgeHTML = `<div class="expansion-badge"><i class="fas fa-puzzle-piece"></i> EXPANSION</div>`;
                 }
 
                 const cardHTML = `
@@ -344,9 +409,7 @@
                             <div class="flip-card-front">
                                 <div class="card-bg-blur" style="background-image: url('${imageSrc}');"></div>
                                 <div class="card-art-contain" style="background-image: url('${imageSrc}');"></div>
-                                
                                 ${expansionBadgeHTML}
-
                                 <div class="complexity-badge">
                                     <div class="complexity-dots">${dotsHTML}</div>
                                     <span>${compText}</span>
@@ -382,6 +445,7 @@
         function filterGames() {
             const term = searchInput.value.toLowerCase();
             const playerVal = playerFilter.value;
+            const ageLimit = parseInt(ageSlider.value); 
             const timeVal = timeFilter.value;
             const complexityVal = complexityFilter.value;
             const modeVal = modeFilter.value;
@@ -393,6 +457,13 @@
                 
                 const pString = g.Players || g.players;
                 const matchesPlayer = checkPlayerSupport(pString, playerVal);
+
+                let matchesAge = true;
+                if (ageLimit < 14) {
+                    const aString = g.Age || g.age || "";
+                    const minAge = parseInt(aString.match(/\d+/)) || 0;
+                    matchesAge = minAge <= ageLimit;
+                }
 
                 let matchesTime = true;
                 if(timeVal !== 'all') {
@@ -424,7 +495,7 @@
                     matchesMechanic = mechText.includes(mechanicVal);
                 }
 
-                return matchesSearch && matchesPlayer && matchesTime && matchesComplexity && matchesMode && matchesCategory && matchesMechanic;
+                return matchesSearch && matchesPlayer && matchesAge && matchesTime && matchesComplexity && matchesMode && matchesCategory && matchesMechanic;
             });
             displayGames(filtered);
         }
